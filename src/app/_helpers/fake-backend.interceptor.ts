@@ -8,8 +8,28 @@ import {User} from '../_models/user';
 export class FakeBackendInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const users: User[] = [
-      {id: 1, login: 'user', email: 'tralala@trololo.troll', password: 'test', roles: 'ROLE_USER'},
-      {id: 2, login: 'admin', email: 'tralala@trololo.troll', password: 'test', roles: 'ROLE_ADMIN'}
+      {
+        id: 1,
+        login: 'user',
+        email: 'tralala@trololo.troll',
+        password: 'test',
+        roles: 'ROLE_USER',
+        is_active: 1,
+        is_email_verified: 1,
+        registration_date: null,
+        token: null
+      },
+      {
+        id: 2,
+        login: 'admin',
+        email: 'tralala@trololo.troll',
+        password: 'test',
+        roles: 'ROLE_ADMIN',
+        is_active: 1,
+        is_email_verified: 1,
+        registration_date: null,
+        token: null
+      }
     ];
 
     const authHeader = request.headers.get('Authorization');
@@ -21,7 +41,9 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       // authenticate - public
       if (request.url.endsWith('/login') && request.method === 'POST') {
         const user = users.find(x => x.login === request.body.login && x.password === request.body.password);
-        if (!user) { return error('Username or password is incorrect'); }
+        if (!user) {
+          return error('Username or password is incorrect');
+        }
         return ok({
           id: user.id,
           login: user.login,
@@ -34,7 +56,9 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
       // get all users
       if (request.url.endsWith('/users') && request.method === 'GET') {
-        if (!isLoggedIn) { return unauthorised(); }
+        if (!isLoggedIn) {
+          return unauthorised();
+        }
         return ok(users);
       }
 
